@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -13,9 +14,12 @@ export default function Home() {
           sleek, collaborative leaderboard experience.
         </p>
 
-        <button className="px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500 rounded-xl shadow-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105">
+        <Link
+          href="/signup"
+          className="px-10 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500 rounded-xl shadow-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+        >
           Get Started
-        </button>
+        </Link>
       </div>
 
       <div className="mt-16 max-w-5xl w-full grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
