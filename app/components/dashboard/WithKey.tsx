@@ -71,6 +71,9 @@ export default function DashboardWithKey({ email }: { email: string }) {
       error: {
         render({ data }) {
           const err = data as Error;
+          if (err?.code === "23505") {
+            return "A leaderboard with that name already exists.";
+          }
           return err?.message || "Failed to create. Please try again.";
         },
       },

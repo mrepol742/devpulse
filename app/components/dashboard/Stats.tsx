@@ -80,12 +80,8 @@ const CardView = ({
 }) => {
   const getLanguageIcon = (lang: string, props = {}) => {
     if (!lang) return null;
-
     const name = lang.toLowerCase();
-
     const cls = `devicon-${name}-plain colored`;
-
-    console.log(cls);
     return <i className={cls} {...props} />;
   };
 

@@ -5,6 +5,7 @@ import { createClient } from "../lib/supabase/client";
 import Link from "next/link";
 import { useState } from "react";
 import { faKey, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 export default function BoardList({
   board,
@@ -22,10 +23,8 @@ export default function BoardList({
       .delete()
       .eq("id", board.id);
 
-    if (error) {
-      alert("Failed to delete leaderboard. Please try again.");
-      return;
-    }
+    if (error)
+      return toast.error("Failed to delete leaderboard. Please try again.");
 
     setShowDeleteModal(false);
     window.location.reload();
