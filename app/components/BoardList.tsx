@@ -6,7 +6,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { faKey, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function BoardList({ board }) {
+export default function BoardList({
+  board,
+}: {
+  board: { id: string; name: string; slug: string; join_code: string };
+}) {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
