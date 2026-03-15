@@ -50,23 +50,25 @@ function LeaderboardStats({ members }: { members: Member[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 text-sm text-gray-400">
       <div className="bg-white/5 p-4 rounded-xl flex-1 text-center border border-white/10">
-        <div className="font-bold text-white text-lg">{totalHours} hrs</div>
-        <div>Total Coding Time</div>
+        <div className="font-bold text-yellow-300 text-lg">
+          {totalHours} hrs
+        </div>
+        <div>Last 7 Days</div>
       </div>
       <div className="bg-white/5 p-4 rounded-xl flex-1 text-center border border-white/10">
-        <div className="font-bold text-white text-lg">{topLanguage}</div>
-        <div>Top Programming</div>
+        <div className="font-bold text-yellow-300 text-lg">{topLanguage}</div>
+        <div>Top Language</div>
       </div>
       <div className="bg-white/5 p-4 rounded-xl flex-1 text-center border border-white/10">
-        <div className="font-bold text-white text-lg">{leastLanguage}</div>
-        <div>Least Programming</div>
+        <div className="font-bold text-yellow-300 text-lg">{leastLanguage}</div>
+        <div>Least Language</div>
       </div>
       <div className="bg-white/5 p-4 rounded-xl flex-1 text-center border border-white/10">
-        <div className="font-bold text-white text-lg">{topEditor}</div>
+        <div className="font-bold text-yellow-300 text-lg">{topEditor}</div>
         <div>Top Editor</div>
       </div>
       <div className="bg-white/5 p-4 rounded-xl flex-1 text-center border border-white/10">
-        <div className="font-bold text-white text-lg">{topOS}</div>
+        <div className="font-bold text-yellow-300 text-lg">{topOS}</div>
         <div>Top OS</div>
       </div>
     </div>
@@ -82,7 +84,6 @@ export default function LeaderboardTable({
   isOwner: boolean;
   ownerId?: string;
 }) {
-  console.log(JSON.stringify(members));
   const ranked = members
     .sort((a, b) => (b.total_seconds || 0) - (a.total_seconds || 0))
     .map((member, index) => ({

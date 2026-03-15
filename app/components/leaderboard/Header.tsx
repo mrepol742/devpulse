@@ -73,11 +73,11 @@ export default function LeaderboardHeader({
   return (
     <>
       <div className="group relative mb-8">
-        <div className="flex">
+        <div className="flex justify-center items-center">
           <div>
             <h1 className="text-3xl font-bold mb-2">{leaderboard.name}</h1>
 
-            <p className="text-gray-400">
+            <p className="text-gray-400 text-center">
               {leaderboard.description?.length > 0
                 ? leaderboard.description
                 : "No description available."}

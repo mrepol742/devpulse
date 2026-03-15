@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server";
 import { createClient } from "../../../lib/supabase/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+  const apiKey = searchParams.get("apiKey") || "";
+  let profile$: { wakatime_api_key: string };
+
+  const wakatimeApiKeyRegex =
+    /^waka_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (apiKey && (!apiKey.trim() || !wakatimeApiKeyRegex.test(apiKey))) {
+    return NextResponse.json(
+      { error: "Please enter a valid WakaTime API key." },
+      { status: 400 },
+    );
+  }
+
+  profile$ = { wakatime_api_key: apiKey };
 
   const {
     data: { user },
@@ -12,31 +26,35 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Get profile with API key
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("wakatime_api_key")
-    .eq("id", user.id)
-    .single();
+  if (!apiKey) {
+    // Get profile with API key
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("wakatime_api_key")
+      .eq("id", user.id)
+      .single();
 
-  if (!profile?.wakatime_api_key) {
-    return NextResponse.json({ error: "No API key found" }, { status: 400 });
-  }
+    if (!profile?.wakatime_api_key) {
+      return NextResponse.json({ error: "No API key found" }, { status: 400 });
+    }
 
-  // Check last fetch
-  const { data: existing } = await supabase
-    .from("user_stats")
-    .select("last_fetched_at")
-    .eq("user_id", user.id)
-    .single();
+    profile$ = { wakatime_api_key: profile.wakatime_api_key };
 
-  const now = new Date();
-  const sixHours = 6 * 60 * 60 * 1000;
+    // Check last fetch
+    const { data: existing } = await supabase
+      .from("user_stats")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
-  if (existing?.last_fetched_at) {
-    const lastFetch = new Date(existing.last_fetched_at).getTime();
-    if (now.getTime() - lastFetch < sixHours) {
-      return NextResponse.json({ message: "Using cached stats" });
+    const now = new Date();
+    const sixHours = 6 * 60 * 60 * 1000;
+
+    if (existing?.last_fetched_at) {
+      const lastFetch = new Date(existing.last_fetched_at).getTime();
+      if (now.getTime() - lastFetch < sixHours) {
+        return NextResponse.json({ success: true, data: existing });
+      }
     }
   }
 
@@ -45,7 +63,7 @@ export async function GET() {
     "https://wakatime.com/api/v1/users/current/stats/last_7_days",
     {
       headers: {
-        Authorization: `Basic ${Buffer.from(profile.wakatime_api_key).toString(
+        Authorization: `Basic ${Buffer.from(profile$.wakatime_api_key).toString(
           "base64",
         )}`,
       },
@@ -61,14 +79,21 @@ export async function GET() {
     );
   }
 
+  if (apiKey) {
+    await supabase
+      .from("profiles")
+      .update({ wakatime_api_key: apiKey })
+      .eq("id", user.id);
+  }
+
   const { data: result, error } = await supabase.from("user_stats").upsert({
     user_id: user.id,
-    total_seconds:  Math.floor(data.data.total_seconds),
+    total_seconds: Math.floor(data.data.total_seconds),
     languages: data.data.languages,
     operating_systems: data.data.operating_systems,
     editors: data.data.editors,
     last_fetched_at: new Date().toISOString(),
   });
 
-  return NextResponse.json({ success: !!result, error });
+  return NextResponse.json({ success: !!result, data: result, error });
 }

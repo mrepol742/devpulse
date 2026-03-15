@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "../../lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 export default function DashboardWithoutKey({ email }: { email: string }) {
-  const supabase = createClient();
   const router = useRouter();
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,13 +13,52 @@ export default function DashboardWithoutKey({ email }: { email: string }) {
   const saveKey = async () => {
     setLoading(true);
 
-    await supabase
-      .from("profiles")
-      .update({ wakatime_api_key: key })
-      .eq("id", (await supabase.auth.getUser()).data.user?.id);
+    const saveKey = new Promise(async (resolve, reject) => {
+      try {
+        const wakatimeApiKeyRegex =
+          /^waka_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!key.trim() || !wakatimeApiKeyRegex.test(key))
+          return reject(new Error("Please enter a valid WakaTime API key."));
 
-    setLoading(false);
-    router.refresh();
+        const isValid = await testApiKey(key);
+        if (!isValid)
+          return reject(
+            new Error("Invalid API key. Please check and try again."),
+          );
+
+        resolve(isValid);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(saveKey, {
+      pending: "Please wait while we validate and save your API key...",
+      success: "API key saved! Redirecting...",
+      error: {
+        render({ data }) {
+          setLoading(false);
+          const err = data as Error;
+          return err?.message || "Failed to login. Please try again.";
+        },
+      },
+    });
+
+    saveKey.then(() => {
+      router.refresh();
+    });
+  };
+
+  const testApiKey = async (apiKey: string) => {
+    const response = await fetch(
+      `/api/wakatime/sync?=apiKey=${encodeURIComponent(apiKey)}`,
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from(apiKey).toString("base64")}`,
+        },
+      },
+    );
+    return response.ok;
   };
 
   return (

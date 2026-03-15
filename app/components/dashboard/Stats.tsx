@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import "devicon/devicon.min.css";
+import { toast } from "react-toastify";
 
 export default function Stats() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/wakatime/sync").then(() => {
-      fetch("/api/wakatime/me")
-        .then((res) => res.json())
-        .then((data) => {
-          setStats(data);
+    fetch("/api/wakatime/sync")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setStats(data.data);
           setLoading(false);
-        });
-    });
+        } else {
+          toast.error("Failed to fetch stats. Please try again later.");
+        }
+        setLoading(false);
+      });
   }, []);
 
   return (
