@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -126,6 +126,23 @@ export default function DashboardLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <SidebarContext.Provider value={{ collapsed }}>
       <div className="min-h-screen bg-[#0a0a1a] text-white">
@@ -134,7 +151,7 @@ export default function DashboardLayout({
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`fixed z-50 top-[18px] transition-all duration-300 w-6 h-6 rounded-full bg-[#0f0f28] border border-white/10 flex items-center justify-center hover:border-indigo-500/30 hover:text-indigo-400 text-gray-600 ${
+          className={`hidden md:flex fixed z-50 top-[18px] transition-all duration-300 w-6 h-6 rounded-full bg-[#0f0f28] border border-white/10 items-center justify-center hover:border-indigo-500/30 hover:text-indigo-400 text-gray-600 ${
             collapsed ? "left-[56px]" : "left-[228px]"
           }`}
         >
