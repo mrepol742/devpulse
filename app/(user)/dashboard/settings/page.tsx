@@ -23,8 +23,12 @@ export default async function LeaderboardsPage() {
         </p>
       </div>
 
-      <UserProfile user={user} />
-      <ResetPassword user={user} />
+      {user && (
+        <>
+          <UserProfile user={user} />
+          <ResetPassword user={user} />
+        </>
+      )}
     </div>
   );
 }
