@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { createClient } from "../../../lib/supabase/client";
 import { toast } from "react-toastify";
+import type { User } from "@supabase/supabase-js";
 
-export default function UserProfile({ user }: any) {
+export default function UserProfile({ user }: { user: User }) {
   const supabase = createClient();
   const [originalName, setOriginalName] = useState(
     user?.user_metadata?.name || "",

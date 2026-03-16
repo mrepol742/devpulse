@@ -167,9 +167,6 @@ export default function DashboardLayout({
             collapsed ? "ml-[68px]" : "ml-[240px]"
           }`}
         >
-          <div className="glow-orb w-[500px] h-[500px] bg-indigo-600/5 top-0 right-0" />
-          <div className="glow-orb w-[300px] h-[300px] bg-purple-600/5 bottom-0 left-1/3" />
-
           <div className="relative z-10">{children}</div>
         </main>
       </div>

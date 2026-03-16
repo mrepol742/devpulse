@@ -51,8 +51,6 @@ export default async function LeaderboardPage(props: {
 
   return (
     <div className="min-h-screen bg-[#0a0a1a] text-white grid-bg relative">
-      <div className="glow-orb w-[400px] h-[400px] bg-indigo-600/8 top-0 right-1/4" />
-
       <div className="max-w-5xl mx-auto p-6 md:p-10 relative z-10">
         <LeaderboardHeader leaderboard={leaderboard} isOwner={isOwner} />
         <LeaderboardTable

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AOS from "aos";
 import "devicon/devicon.min.css";
 import { toast } from "react-toastify";
 import {
@@ -64,6 +65,14 @@ export default function Stats() {
   useEffect(() => {
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (!syncing) {
+      setTimeout(() => {
+        AOS.refresh();
+      }, 200);
+    }
+  }, [syncing, stats]);
 
   const handleSync = () => {
     setSyncing(true);
@@ -145,7 +154,10 @@ export default function Stats() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div 
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        data-aos="fade-up"
+      >
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-sm text-gray-600">Your coding activity overview</p>
@@ -187,8 +199,13 @@ export default function Stats() {
         <>
           {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {statCards.map((card) => (
-              <div key={card.label} className="glass-card p-5 group">
+            {statCards.map((card, idx) => (
+              <div 
+                key={card.label} 
+                className="glass-card p-5 group"
+                data-aos="fade-up"
+                data-aos-delay={idx * 100}
+              >
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
                     {card.label}
@@ -224,7 +241,11 @@ export default function Stats() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Area Chart - Coding Activity */}
-            <div className="glass-card p-6 lg:col-span-2">
+            <div 
+              className="glass-card p-6 lg:col-span-2"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-sm font-semibold text-white">
                   Coding Activity
@@ -292,6 +313,9 @@ export default function Stats() {
                       strokeWidth={2.5}
                       fillOpacity={1}
                       fill="url(#colorHours)"
+                      isAnimationActive={true}
+                      animationDuration={1500}
+                      animationEasing="ease-out"
                       dot={{
                         r: 4,
                         fill: "#0a0a1a",
@@ -311,7 +335,11 @@ export default function Stats() {
             </div>
 
             {/* Donut Chart - Language Distribution */}
-            <div className="glass-card p-6">
+            <div 
+              className="glass-card p-6"
+              data-aos="fade-up"
+              data-aos-delay="300"
+            >
               <h3 className="text-sm font-semibold text-white mb-4">
                 Language Distribution
               </h3>
@@ -327,6 +355,9 @@ export default function Stats() {
                       paddingAngle={3}
                       dataKey="value"
                       stroke="none"
+                      isAnimationActive={true}
+                      animationDuration={1500}
+                      animationEasing="ease-out"
                     >
                       {pieData.map((_, index) => (
                         <Cell
@@ -367,7 +398,10 @@ export default function Stats() {
 
           {/* Editors & OS */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="glass-card p-6">
+            <div 
+              className="glass-card p-6"
+              data-aos="fade-in"
+            >
               <h3 className="text-sm font-semibold text-white mb-4">Editors</h3>
               <div className="space-y-3">
                 {stats.editors.slice(0, 4).map((editor, idx) => (
@@ -396,7 +430,10 @@ export default function Stats() {
               </div>
             </div>
 
-            <div className="glass-card p-6">
+            <div 
+              className="glass-card p-6"
+              data-aos="fade-in"
+            >
               <h3 className="text-sm font-semibold text-white mb-4">
                 Operating Systems
               </h3>

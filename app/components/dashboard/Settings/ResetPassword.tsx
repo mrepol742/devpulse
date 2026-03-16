@@ -4,8 +4,9 @@ import { useRef, useState } from "react";
 import { createClient } from "../../../lib/supabase/client";
 import { toast } from "react-toastify";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { User } from "@supabase/supabase-js";
 
-export default function ResetPassword({ user }: any) {
+export default function ResetPassword({ user }: { user: User }) {
   const supabase = createClient();
   const [email] = useState(user?.email || "");
   const [loading, setLoading] = useState(false);

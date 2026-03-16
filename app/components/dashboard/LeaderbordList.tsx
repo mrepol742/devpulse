@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "../../lib/supabase/server";
 import BoardList from "../BoardList";
 
@@ -22,13 +21,18 @@ export default async function LeaderboardsList() {
     .eq("user_id", user.id)
     .neq("role", "owner");
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const joinedBoards = joined?.map((j: any) => j.leaderboards) || [];
 
   const ownedCount = owned?.length || 0;
   const joinedCount = joinedBoards.length;
 
   return (
-    <div className="glass-card p-6 h-full">
+    <div 
+      className="glass-card p-6 h-full"
+      data-aos="fade-up"
+      data-aos-delay="200"
+    >
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-xs font-semibold text-indigo-400 uppercase tracking-widest">
           Your Leaderboards
@@ -57,7 +61,7 @@ export default async function LeaderboardsList() {
             <p className="text-[10px] uppercase tracking-widest text-gray-700 font-semibold mt-4 mb-2">
               Joined ({joinedCount})
             </p>
-            {joinedBoards.map((board: any) => (
+            {joinedBoards.map((board: { id: string; name: string; slug: string; join_code: string }) => (
               <BoardList key={board.id} board={board} />
             ))}
           </>

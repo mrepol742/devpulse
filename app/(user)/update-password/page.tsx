@@ -12,7 +12,6 @@ export default async function UpdatePassword() {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a1a] text-white px-4 grid-bg relative">
-        <div className="glow-orb w-[400px] h-[400px] bg-purple-600/10 top-1/4 left-1/2 -translate-x-1/2" />
 
         <div className="w-full max-w-lg glass-card p-10 relative z-10">
           <div className="flex items-center gap-3 mb-2">
