@@ -57,17 +57,10 @@ for update
 using (auth.uid() = owner_id);
 
 /* ---- Members Policies ----- */
-create policy "Users can see members of joined leaderboards"
+create policy "Users can see their own membership"
 on public.leaderboard_members
 for select
-using (
-  user_id = auth.uid()
-  OR leaderboard_id IN (
-    select leaderboard_id
-    from public.leaderboard_members
-    where user_id = auth.uid()
-  )
-);
+using (user_id = auth.uid());
 
 create policy "Users can join leaderboard"
 on public.leaderboard_members

@@ -25,11 +25,8 @@ export default async function Auth(req: NextRequest) {
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const user = session?.user;
-
+    data: { user },
+  } = await supabase.auth.getUser();
   const { pathname } = req.nextUrl;
 
   const protectedRoutes = ["/dashboard", "/logout"];
@@ -49,5 +46,5 @@ export default async function Auth(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  return response;
+  return undefined;
 }

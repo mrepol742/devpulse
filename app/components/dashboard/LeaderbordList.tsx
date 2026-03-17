@@ -27,11 +27,11 @@ export default async function LeaderboardsList() {
     .select("id, name, slug, owner_id")
     .eq("owner_id", user.id);
 
-  const { data: joined } = await supabase
+  const { data: joined, error } = await supabase
     .from("leaderboard_members")
-    .select("leaderboards(id, name, slug)")
+    .select("leaderboards(id, name, slug, owner_id)")
     .eq("user_id", user.id)
-    .neq("role", "owner");
+    .eq("role", "member");
 
   const joinedBoards =
     joined?.flatMap((j: LeaderboardMember) => j.leaderboards) || [];
