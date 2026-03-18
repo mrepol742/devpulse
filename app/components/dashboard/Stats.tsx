@@ -97,7 +97,6 @@ export default function Stats() {
     : formatHours(stats.total_seconds / 7);
   const topLang = stats.languages[0]?.name || "N/A";
   const topEditor = stats.editors[0]?.name || "N/A";
-  const maxLangSeconds = stats.languages[0]?.total_seconds || 1;
 
   // Generate mock daily data from total (WakaTime API gives weekly aggregate)
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -304,7 +303,7 @@ export default function Stats() {
                       }}
                       labelStyle={{ color: "#9ca3af" }}
                       itemStyle={{ color: "#818cf8" }}
-                      formatter={(value) => [`${value as number}h`, "Time"]}
+                      formatter={(value) => [formatHours((value as number) * 3600), "Time"]}
                     />
                     <Area
                       type="monotone"
