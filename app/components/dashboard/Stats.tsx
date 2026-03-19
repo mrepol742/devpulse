@@ -39,7 +39,7 @@ const CHART_COLORS = [
 
 export default function Stats() {
   const [syncing, setSyncing] = useState(false);
-  const [barMounted, setBarMounted] = useState(false);
+  const [animated, setAnimated] = useState(false);
   const [stats, setStats] = useState<StatsData>({
     total_seconds: 0,
     daily_average: 0,
@@ -73,12 +73,17 @@ export default function Stats() {
         AOS.refresh();
         setBarMounted(true);
       }, 200);
-    } else {
-      setBarMounted(false);
+      
+      // Trigger progress bar animation shortly after mounting/syncing
+      const timer = setTimeout(() => {
+        setAnimated(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [syncing, stats]);
 
   const handleSync = () => {
+    setAnimated(false); // Reset animation state so it plays again
     setSyncing(true);
     fetchStats();
   };
@@ -121,13 +126,10 @@ export default function Stats() {
     value: l.total_seconds,
   }));
 
-  const totalBarPct = Math.min((stats.total_seconds / (40 * 3600)) * 100, 100);
-  const avgDailySeconds =
-    stats.daily_average || stats.total_seconds / 7;
-  const avgBarPct = Math.min((avgDailySeconds / (8 * 3600)) * 100, 100);
-  // Top language / editor: use WakaTime's percent directly
-  const langBarPct = Math.min(stats.languages[0]?.percent || 0, 100);
-  const editorBarPct = Math.min(stats.editors[0]?.percent || 0, 100);
+  const totalCodingProgress = Math.min(100, (stats.total_seconds / (40 * 3600)) * 100);
+  const dailyAverageProgress = Math.min(100, ((stats.daily_average || stats.total_seconds / 7) / (8 * 3600)) * 100);
+  const topLangProgress = stats.languages[0]?.percent || 0;
+  const topEditorProgress = stats.editors[0]?.percent || 0;
 
   const statCards = [
     {
@@ -135,32 +137,36 @@ export default function Stats() {
       value: totalHoursFormatted,
       sub: "Last 7 days",
       color: "#6366f1",
-      trend: `${totalBarPct.toFixed(0)}%`,
-      barPct: totalBarPct,
+      trend: `${totalCodingProgress.toFixed(0)}%`,
+      trendUp: true,
+      progress: totalCodingProgress,
     },
     {
       label: "Daily Average",
       value: avgDailyFormatted,
       sub: "Per day",
       color: "#8b5cf6",
-      trend: `${avgBarPct.toFixed(0)}%`,
-      barPct: avgBarPct,
+      trend: `${dailyAverageProgress.toFixed(0)}%`,
+      trendUp: true,
+      progress: dailyAverageProgress,
     },
     {
       label: "Top Language",
       value: topLang,
       sub: formatHours(stats.languages[0]?.total_seconds || 0),
       color: "#22d3ee",
-      trend: `${langBarPct.toFixed(0)}%`,
-      barPct: langBarPct,
+      trend: `${topLangProgress.toFixed(0)}%`,
+      trendUp: true,
+      progress: topLangProgress,
     },
     {
       label: "Editor",
       value: topEditor,
       sub: formatHours(stats.editors[0]?.total_seconds || 0),
       color: "#34d399",
-      trend: `${editorBarPct.toFixed(0)}%`,
-      barPct: editorBarPct,
+      trend: `${topEditorProgress.toFixed(0)}%`,
+      trendUp: true,
+      progress: topEditorProgress,
     },
   ];
 
@@ -247,9 +253,9 @@ export default function Stats() {
                   }}
                 >
                   <div
-                    className="h-full rounded-full transition-[width] duration-1000 ease-out"
+                    className="h-full rounded-full transition-all duration-[2000ms] ease-in-out"
                     style={{
-                      width: barMounted ? `${card.barPct}%` : "0%",
+                      width: animated ? `${card.progress}%` : "0%",
                       background: card.color,
                     }}
                   />
@@ -334,8 +340,9 @@ export default function Stats() {
                       fillOpacity={1}
                       fill="url(#colorHours)"
                       isAnimationActive={true}
-                      animationDuration={1500}
-                      animationEasing="ease-out"
+                      animationBegin={500}
+                      animationDuration={2000}
+                      animationEasing="ease-in-out"
                       dot={{
                         r: 4,
                         fill: "#0a0a1a",
@@ -376,8 +383,9 @@ export default function Stats() {
                       dataKey="value"
                       stroke="none"
                       isAnimationActive={true}
-                      animationDuration={1500}
-                      animationEasing="ease-out"
+                      animationBegin={500}
+                      animationDuration={2000}
+                      animationEasing="ease-in-out"
                     >
                       {pieData.map((_, index) => (
                         <Cell
