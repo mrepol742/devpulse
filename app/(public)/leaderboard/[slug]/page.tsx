@@ -61,7 +61,7 @@ export default async function LeaderboardPage(props: {
         />
       </div>
 
-      <CTA />
+      {!user && <CTA />}
       <Footer />
     </div>
   );

@@ -22,7 +22,7 @@ async function getLeaderboard(code: string) {
 async function getMemberCount(leaderboardId: string) {
   const supabase = await createClient();
   const { count } = await supabase
-    .from("leaderboard_members")
+    .from("leaderboard_members_view")
     .select("*", { count: "exact", head: true })
     .eq("leaderboard_id", leaderboardId);
   return count ?? 0;
@@ -163,7 +163,7 @@ export default async function JoinPage({ searchParams }: Props) {
           </div>
 
           <p className="text-xs uppercase tracking-[0.2em] text-indigo-400 font-semibold mb-3">
-            You&apos;ve been invited
+            {alreadyMember ? "You\u2019re already a member of" : "You\u2019ve been invited to"}
           </p>
 
           <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-2">
@@ -198,17 +198,19 @@ export default async function JoinPage({ searchParams }: Props) {
             alreadyMember={alreadyMember}
           />
 
-          <p className="text-[11px] text-gray-600 mt-6">
-            Powered by{" "}
-            <Link href="/" className="text-indigo-400/70 hover:text-indigo-400 transition-colors">
-              DevPulse
-            </Link>{" "}
-            &mdash; Track your coding activity &amp; compete
-          </p>
+          {!user && (
+            <p className="text-[11px] text-gray-600 mt-6">
+              Powered by{" "}
+              <Link href="/" className="text-indigo-400/70 hover:text-indigo-400 transition-colors">
+                DevPulse
+              </Link>{" "}
+              &mdash; Track your coding activity &amp; compete
+            </p>
+          )}
         </div>
       </div>
 
-      <Footer />
+      {!user && <Footer />}
     </div>
   );
 }

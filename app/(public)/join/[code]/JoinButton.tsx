@@ -29,7 +29,8 @@ export default function JoinButton({
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
-        Already a Member &mdash; View Leaderboard
+        <span className="sm:hidden">View</span>
+        <span className="hidden sm:inline">View Leaderboard</span>
       </Link>
     );
   }

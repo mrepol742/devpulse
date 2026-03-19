@@ -1,4 +1,4 @@
-﻿import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCode, faTerminal, faServer, faBolt, faFire, faStar, faRocket } from "@fortawesome/free-solid-svg-icons";
 
 type Member = {

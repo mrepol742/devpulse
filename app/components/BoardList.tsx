@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createClient } from "../lib/supabase/client";
@@ -18,7 +18,11 @@ export default function BoardList({
 }) {
   const supabase = createClient();
   const [showCodeModal, setShowCodeModal] = useState(false);
-  const [selectedCode, setSelectedCode] = useState<string | null>(null);        
+  const [selectedCode, setSelectedCode] = useState<string | null>(null);
+  const inviteUrl =
+    typeof window !== "undefined" && selectedCode
+      ? `${window.location.origin}/join?id=${selectedCode}`
+      : "";
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleDelete = async () => {
@@ -155,22 +159,47 @@ export default function BoardList({
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
             
             <h3 className="text-[11px] font-bold tracking-widest uppercase text-indigo-400 mb-6 text-center flex items-center justify-center gap-2">
-              <FontAwesomeIcon icon={faKey} /> Server Join Code
+              <FontAwesomeIcon icon={faKey} /> Share Server
             </h3>
-            
-            <div className="bg-black/50 border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <p className="text-3xl font-mono text-white tracking-[0.2em] font-bold relative z-10">
-                {selectedCode}
-              </p>
-            </div>
-            
-            <div className="mt-8 flex justify-center">
+
+            <div className="space-y-5">
+              <div>
+                <p className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2">
+                  Join Code
+                </p>
+                <div className="bg-black/50 border border-white/10 rounded-xl p-4 text-center relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <p className="text-2xl font-mono text-white tracking-[0.2em] font-bold relative z-10">
+                    {selectedCode}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2">
+                  Invite URL
+                </p>
+                <div className="bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-300 flex items-center gap-2">
+                  <span className="flex-1 truncate">{inviteUrl}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!inviteUrl) return;
+                      navigator.clipboard.writeText(inviteUrl);
+                      toast.success("Invite link copied");
+                    }}
+                    className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 transition-colors"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
               <button
                 onClick={() => setShowCodeModal(false)}
                 className="w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium text-gray-300 transition-colors"
               >
-                Close Window
+                Close
               </button>
             </div>
           </div>
