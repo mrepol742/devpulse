@@ -41,7 +41,14 @@ export async function GET(request: Request) {
     // Check last fetch
     const { data: existing } = await supabase
       .from("user_stats")
-      .select("*")
+      .select(
+        `
+        *,
+        projects:user_projects (
+          projects
+        )
+      `,
+      )
       .eq("user_id", user.id)
       .single();
 
@@ -84,14 +91,37 @@ export async function GET(request: Request) {
       .eq("id", user.id);
   }
 
-  const { data: result, error } = await supabase.from("user_stats").upsert({
-    user_id: user.id,
-    total_seconds: Math.floor(data.data.total_seconds),
-    languages: data.data.languages,
-    operating_systems: data.data.operating_systems,
-    editors: data.data.editors,
-    last_fetched_at: new Date().toISOString(),
-  });
+  const { data: statsResult, error: statsError } = await supabase
+    .from("user_stats")
+    .upsert({
+      user_id: user.id,
+      total_seconds: Math.floor(data.data.total_seconds),
+      languages: data.data.languages,
+      operating_systems: data.data.operating_systems,
+      editors: data.data.editors,
+      last_fetched_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
 
-  return NextResponse.json({ success: !!result, data: result, error });
+  const { data: projectsResult, error: projectsError } = await supabase
+    .from("user_projects")
+    .upsert({
+      user_id: user.id,
+      projects: data.data.projects,
+      last_fetched_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  const mergedResult = {
+    ...statsResult,
+    projects: projectsResult?.projects || [],
+  };
+
+  return NextResponse.json({
+    success: !!statsResult && !statsError && !projectsError,
+    data: mergedResult,
+    error: statsError || projectsError,
+  });
 }
