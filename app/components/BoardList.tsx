@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createClient } from "../lib/supabase/client";
 import Link from "next/link";
 import { useState } from "react";
-import { faKey, faRotateRight, faTrashAlt, faChevronRight, faServer } from "@fortawesome/free-solid-svg-icons";
+import { createPortal } from "react-dom";
+import { faKey, faRotateRight, faTrashAlt, faChevronRight, faServer, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { Leaderboard } from "./dashboard/LeaderbordList";
 import { User } from "@supabase/supabase-js";
@@ -12,9 +13,12 @@ import { User } from "@supabase/supabase-js";
 export default function BoardList({
   user,
   board,
+  allowLeave = false,
 }: {
   user: User;
   board: Leaderboard;
+  /** When true (joined networks only), show Leave to remove membership */
+  allowLeave?: boolean;
 }) {
   const supabase = createClient();
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -24,6 +28,8 @@ export default function BoardList({
       ? `${window.location.origin}/join?id=${selectedCode}`
       : "";
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   const handleDelete = async () => {
     const { error } = await supabase
@@ -32,6 +38,25 @@ export default function BoardList({
       .eq("id", board.id);
 
     if (error) setShowDeleteModal(false);
+    window.location.reload();
+  };
+
+  const handleLeave = async () => {
+    setLeaving(true);
+    const { error } = await supabase
+      .from("leaderboard_members")
+      .delete()
+      .eq("leaderboard_id", board.id)
+      .eq("user_id", user.id);
+
+    setLeaving(false);
+    setShowLeaveModal(false);
+
+    if (error) {
+      toast.error(error.message || "Could not leave this leaderboard.");
+      return;
+    }
+    toast.success("You left the leaderboard.");
     window.location.reload();
   };
 
@@ -151,6 +176,19 @@ export default function BoardList({
             </button>
           </div>
         )}
+
+        {allowLeave && user.id !== board.owner_id && (
+          <div className="flex items-center gap-1 sm:gap-2 ml-2 pl-4 border-l border-white/10 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowLeaveModal(true)}
+              className="w-8 h-8 flex items-center justify-center rounded-md text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+              title="Leave leaderboard"
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {showCodeModal && (
@@ -204,6 +242,39 @@ export default function BoardList({
             </div>
           </div>
         </div>
+      )}
+
+      {showLeaveModal && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="glass-card p-8 w-full max-w-sm relative shadow-2xl border-amber-500/20">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/20 rounded-full blur-3xl" />
+            <h3 className="text-lg font-bold text-gray-200 mb-2">Leave leaderboard?</h3>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              You&apos;ll be removed from{" "}
+              <span className="font-mono text-gray-300 bg-white/5 px-1 rounded">{board.name}</span>.
+              You can rejoin later with an invite link or code.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLeaveModal(false)}
+                disabled={leaving}
+                className="flex-1 py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium text-gray-300 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLeave}
+                disabled={leaving}
+                className="flex-1 py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
+              >
+                {leaving ? "Leaving…" : "Leave"}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {showDeleteModal && (

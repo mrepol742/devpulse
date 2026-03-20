@@ -1,4 +1,4 @@
-﻿import { createClient } from "../../lib/supabase/server";
+import { createClient } from "../../lib/supabase/server";
 import BoardList from "../BoardList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faCrown, faGhost } from "@fortawesome/free-solid-svg-icons";
@@ -93,7 +93,7 @@ export default async function LeaderboardsList() {
               {joinedBoards.map((board) => (
                 <div key={board.id} className="group relative rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300 overflow-hidden shadow-md">
                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   <BoardList user={user} board={board} />
+                   <BoardList user={user} board={board} allowLeave />
                 </div>
               ))}
             </div>
