@@ -41,18 +41,14 @@ export default function Messages({
                 {/*{msg.text}*/}
                 <ReactMarkdown
                   components={{
-                    code({ inline, className, children, ...props }) {
+                    code({ className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || "");
-                      if (inline) {
-                        return (
-                          <code className="px-1 rounded font-mono" {...props}>
-                            {children}
-                          </code>
-                        );
-                      } else {
-                        return (
+
+                      return (
+                        <>
+                          {/* @ts-expect-error atomDark style type not compatible with SyntaxHighlighter */}
                           <SyntaxHighlighter
-                            style={atomDark}
+                            style={atomDark as any}
                             language={match ? match[1] : "text"}
                             PreTag="pre"
                             className="rounded-md text-sm"
@@ -60,8 +56,8 @@ export default function Messages({
                           >
                             {String(children).replace(/\n$/, "")}
                           </SyntaxHighlighter>
-                        );
-                      }
+                        </>
+                      );
                     },
                   }}
                 >
@@ -69,7 +65,9 @@ export default function Messages({
                 </ReactMarkdown>
               </div>
 
-              <div className="text-muted text-sm">{timeAgo(msg.created_at)}</div>
+              <div className="text-muted text-sm">
+                {timeAgo(msg.created_at)}
+              </div>
             </div>
           </div>
         ))}

@@ -23,15 +23,15 @@ export default function LanguageDestribution({
         <h3 className="text-sm font-semibold text-white mb-2">
           Language Distribution
         </h3>
-        <div className="flex-1 min-h-[160px] flex flex-col justify-center">     
+        <div className="flex-1 min-h-[160px] flex flex-col justify-center">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={pieData}
                 cx="50%"
                 cy="50%"
-                innerRadius={55}
-                outerRadius={85}
+                innerRadius={45}
+                outerRadius={70}
                 paddingAngle={3}
                 dataKey="value"
                 stroke="none"
