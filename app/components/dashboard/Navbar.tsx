@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartLine,
   faTrophy,
-  faRightFromBracket,
   faChevronLeft,
   faChevronRight,
   faGear,
@@ -18,7 +17,7 @@ import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 const SidebarContext = createContext({ collapsed: false });
 
-function Sidebar({ email, name }: { email: string; name: string }) {
+function Sidebar() {
   const pathname = usePathname();
   const { collapsed } = useContext(SidebarContext);
 
@@ -26,7 +25,6 @@ function Sidebar({ email, name }: { email: string; name: string }) {
     { href: "/dashboard", label: "Dashboard", icon: faChartLine },
     { href: "/dashboard/chat", label: "Chat", icon: faMessage },
     { href: "/dashboard/leaderboards", label: "Leaderboards", icon: faTrophy },
-    { href: "/dashboard/settings", label: "Settings", icon: faGear },
   ];
 
   return (
@@ -46,26 +44,6 @@ function Sidebar({ email, name }: { email: string; name: string }) {
         {!collapsed && (
           <span className="text-base font-bold gradient-text">DevPulse</span>
         )}
-      </div>
-
-      <div
-        className={`px-4 py-4 border-b border-white/5 ${collapsed ? "flex justify-center" : ""}`}
-      >
-        <div
-          className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-            {email.charAt(0).toUpperCase()}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-200 truncate">
-                {name}
-              </p>
-              <p className="text-[11px] text-gray-600 truncate">{email}</p>
-            </div>
-          )}
-        </div>
       </div>
 
       <nav className="flex-1 px-3 py-5 space-y-1">
@@ -97,29 +75,11 @@ function Sidebar({ email, name }: { email: string; name: string }) {
           </Link>
         ))}
       </nav>
-
-      <div className="px-3 py-4 border-t border-white/5 space-y-1">
-        <Link
-          href="/logout"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition ${
-            collapsed ? "justify-center" : ""
-          }`}
-          title={collapsed ? "Logout" : undefined}
-        >
-          <FontAwesomeIcon
-            icon={faRightFromBracket}
-            className="w-4 h-4 shrink-0"
-          />
-          {!collapsed && "Logout"}
-        </Link>
-      </div>
     </aside>
   );
 }
 
 export default function DashboardLayout({
-  email,
-  name,
   children,
 }: {
   email: string;
@@ -148,7 +108,7 @@ export default function DashboardLayout({
   return (
     <SidebarContext.Provider value={{ collapsed }}>
       <div className="min-h-screen bg-[#0a0a1a] text-white">
-        <Sidebar email={email} name={name} />
+        <Sidebar />
 
         {/* Collapse Toggle */}
         <button
