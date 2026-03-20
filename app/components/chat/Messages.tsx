@@ -9,14 +9,21 @@ export default function Messages({
   messages,
   user,
   conversations,
+  bottomRef,
 }: {
   messages: Message[];
   user: User;
   conversations: Conversation[];
+  bottomRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
     <>
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.length === 0 && (
+          <div className="text-gray-500 text-sm italic text-center mt-10">
+            No messages yet. Start the conversation!
+          </div>
+        )}
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -71,6 +78,8 @@ export default function Messages({
             </div>
           </div>
         ))}
+
+        <div ref={bottomRef} />
       </div>
     </>
   );

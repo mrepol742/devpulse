@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Conversations from "./chat/Conversations";
 import Messages from "./chat/Messages";
+import { toast } from "react-toastify";
 
 export interface Conversation {
   id: string;
@@ -50,6 +51,8 @@ export default function Chat({ user }: { user: User }) {
   const [allUsers, setAllUsers] = useState<ChatUser[]>([]);
   const channelRef = useRef<RealtimeChannel>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [creatingConversation, setCreatingConversation] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -169,6 +172,9 @@ export default function Chat({ user }: { user: User }) {
               created_at: payload.new.created_at,
             },
           ]);
+          setTimeout(() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, 100);
         },
       )
       .subscribe();
@@ -181,7 +187,12 @@ export default function Chat({ user }: { user: User }) {
         .select("*")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
-      if (data) setMessages(data);
+      if (data) {
+        setMessages(data);
+        setTimeout(() => {
+          bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
     };
 
     fetchMessages();
@@ -206,6 +217,9 @@ export default function Chat({ user }: { user: User }) {
   }, [showModal, user.id]);
 
   const createConversation = async (otherUser: ChatUser) => {
+    if (creatingConversation) return;
+
+    setCreatingConversation(true);
     const existing = conversations.find((conv) =>
       conv.users.some((u) => u.id === otherUser.user_id),
     );
@@ -225,21 +239,25 @@ export default function Chat({ user }: { user: User }) {
 
     const convId = convData.id;
 
-    await supabase.from("conversation_participants").insert([
+    await supabase.from("conversation_participants").upsert(
+      [
+        {
+          conversation_id: convId,
+          user_id: user.id,
+          email: user.email,
+        },
+        {
+          conversation_id: convId,
+          user_id: otherUser.user_id,
+          email: otherUser.email,
+        },
+      ],
       {
-        conversation_id: convId,
-        user_id: user.id,
-        email: user.email,
+        onConflict: "conversation_id,user_id",
       },
-      {
-        conversation_id: convId,
-        user_id: otherUser.user_id,
-        email: otherUser.email,
-      },
-    ]);
+    );
 
     setConversationId(convId);
-    setShowModal(false);
     setConversations((prev) => [
       ...prev,
       {
@@ -250,6 +268,8 @@ export default function Chat({ user }: { user: User }) {
         ],
       },
     ]);
+    setCreatingConversation(false);
+    setShowModal(false);
   };
 
   const sendMessage = async () => {
@@ -260,6 +280,10 @@ export default function Chat({ user }: { user: User }) {
       sender_id: user.id,
       text: input.slice(0, 1000), // limit to 1000 chars
     });
+
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
 
     setInput("");
   };
@@ -290,6 +314,7 @@ export default function Chat({ user }: { user: User }) {
             messages={messages}
             user={user}
             conversations={conversations}
+            bottomRef={bottomRef}
           />
 
           <div className="p-4 border-t border-neutral-700">
@@ -336,8 +361,8 @@ export default function Chat({ user }: { user: User }) {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-neutral-900 w-full max-w-sm rounded-xl p-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50 backdrop-blur-sm">
+          <div className="glass-card p-8">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -355,7 +380,7 @@ export default function Chat({ user }: { user: User }) {
                     onClick={() => createConversation(u)}
                     className="flex items-center gap-3 p-2 rounded hover:bg-neutral-800 cursor-pointer"
                   >
-                    <div className="flex justify-center items-center w-8 h-8 rounded-full bg-neutral-600">
+                    <div className="flex justify-center items-center w-10 h-8 rounded-full bg-neutral-600">
                       {u.email[0].toUpperCase()}
                     </div>
                     <div className="w-full">
@@ -366,7 +391,7 @@ export default function Chat({ user }: { user: User }) {
             </div>
             <button
               onClick={() => setShowModal(false)}
-              className="mt-3 w-full py-2 bg-neutral-700 rounded"
+              className="mt-4 text-sm text-gray-500 hover:text-gray-300 transition"
             >
               Cancel
             </button>
