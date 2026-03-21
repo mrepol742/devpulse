@@ -32,7 +32,7 @@ export default async function Home() {
       .from("top_user_stats")
       .select("*")
       .order("total_seconds", { ascending: false })
-      .limit(3),
+      .limit(100),
   ]);
 
   const leaderboards = leaderboardsRes.data ?? [];
