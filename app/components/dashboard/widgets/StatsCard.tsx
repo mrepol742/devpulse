@@ -1,3 +1,4 @@
+"use client";
 export interface StatCard {
   label: string;
   value: string;
@@ -72,3 +73,4 @@ export default function StatsCard({
     </div>
   );
 }
+
