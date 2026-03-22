@@ -1,3 +1,4 @@
+"use client";
 import { User } from "@supabase/supabase-js";
 import { Conversation } from "../Chat";
 
@@ -32,3 +33,4 @@ export default function Conversations({
     </>
   );
 }
+
