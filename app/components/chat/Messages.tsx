@@ -53,13 +53,15 @@ export default function Messages({
 
                       return (
                         <>
-                          {/* @ts-expect-error atomDark style type not compatible with SyntaxHighlighter */}
+                          { }
+                          
                           <SyntaxHighlighter
-                            style={atomDark as any}
+                            
+                        style={atomDark as { [key: string]: React.CSSProperties }}
                             language={match ? match[1] : "text"}
                             PreTag="pre"
                             className="rounded-md text-sm"
-                            {...props}
+                            {...(props as Record<string, unknown>)}
                           >
                             {String(children).replace(/\n$/, "")}
                           </SyntaxHighlighter>

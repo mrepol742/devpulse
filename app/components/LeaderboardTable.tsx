@@ -1,17 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faClock,
-  faCode,
-  faTerminal,
-  faServer,
   faBolt,
   faFire,
   faStar,
-  faRocket,
-  faTrophy,
   faGhost,
   faMedal,
   faCrown,
+  faSeedling,
+  faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { Database } from "../supabase-types";
 
@@ -48,11 +44,11 @@ const getBadgeInfo = (rank: number, hours: number) => {
   if (hours >= 50) return { label: "ELITE", class: "badge-elite", icon: faFire };
   if (hours >= 20) return { label: "PRO", class: "badge-pro", icon: faBolt };
   if (hours >= 5) return { label: "NOVICE", class: "badge-novice", icon: faMedal };
-  if (hours >= 1) return { label: "NEWBIE", class: "badge-newbie", icon: null };
-  return { label: "", class: "hidden", icon: null }; // 0 hours
+  if (hours >= 1) return { label: "NEWBIE", class: "badge-newbie", icon: faSeedling };
+  return { label: "NONE", class: "badge-none", icon: faMinus }; // 0 hours
 };
 
-function LeaderboardPodium({ topUsers }: { topUsers: any[] }) {
+function LeaderboardPodium({ topUsers }: { topUsers: { user_id: string; rank: number; email: string | null; hours: number; role: string | null; languages: string[]; os: string; editor: string; }[] }) {
   if (topUsers.length === 0) return null;
 
   return (
@@ -83,7 +79,7 @@ function LeaderboardPodium({ topUsers }: { topUsers: any[] }) {
                   </div>
                   <div>
                     <div className="font-semibold text-white tracking-tight truncate max-w-[120px] sm:max-w-[140px]">
-                      {user.email.split("@")[0]}
+                      {user.email?.split("@")[0] || "Unknown"}
                     </div>
                     <div className={`mt-1.5 badge-base ${badgeInfo.class}`}>
                       {badgeInfo.icon && (
@@ -95,7 +91,7 @@ function LeaderboardPodium({ topUsers }: { topUsers: any[] }) {
                 </div>
                 
                 <div className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5 backdrop-blur-md shadow-lg ${rankColor}`}>
-                  <span className="text-xl font-black tracking-widest leading-none">
+                    <span className="font-mono text-lg sm:text-xl tracking-tighter leading-none">
                     {idx === 0 ? "01" : idx === 1 ? "02" : "03"}
                   </span>
                 </div>
@@ -135,6 +131,8 @@ function LeaderboardPodium({ topUsers }: { topUsers: any[] }) {
   );
 }
 
+import LeaderboardStats from "./leaderboard/LeaderboardStats";
+
 export default function LeaderboardTable({
   members,
   ownerId,
@@ -167,7 +165,7 @@ export default function LeaderboardTable({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col xl:flex-row gap-6">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -249,6 +247,11 @@ export default function LeaderboardTable({
           border: 1px solid rgba(107,114,128,0.4);
           color: #d1d5db;
         }
+        .badge-none {
+          background: rgba(55,65,81,0.15);
+          border: 1px dashed rgba(55,65,81,0.4);
+          color: #9ca3af;
+        }
         @keyframes pulse-glow {
           0%, 100% { box-shadow: 0 0 15px rgba(255,0,102,0.6); }
           50% { box-shadow: 0 0 25px rgba(255,0,102,1); }
@@ -260,12 +263,15 @@ export default function LeaderboardTable({
       `,
         }}
       />
-      
-      <LeaderboardPodium topUsers={ranked.slice(0, 3)} />
 
-      {ranked.length === 0 ? (
-        <div className="glass-card p-16 text-center">
-          <p className="text-gray-500 tracking-tight font-medium">
+      <LeaderboardStats members={members} />
+
+      <div className="flex-1 min-w-0">
+        <LeaderboardPodium topUsers={ranked.slice(0, 3)} />
+
+        {ranked.length === 0 ? (
+          <div className="glass-card p-16 text-center">
+            <p className="text-gray-500 tracking-tight font-medium">
             No tracking data available yet.
           </p>
         </div>
@@ -274,9 +280,9 @@ export default function LeaderboardTable({
           {/* Header Row (Desktop) */}
           <div className="hidden md:flex items-center px-4 sm:px-6 py-4 border-b border-white/5 bg-white/[0.01] text-[10px] font-bold text-gray-500 uppercase tracking-widest">
             <div className="w-12 shrink-0 text-center">Rank</div>
-            <div className="flex-1 ml-4">Developer</div>
-            <div className="w-48 lg:w-72 xl:w-80">Language</div>
-              <div className="w-32 lg:w-48">Editor</div>
+            <div className="flex-1 ml-4 min-w-[150px]">Developer</div>
+            <div className="w-40 md:w-48 lg:w-48 xl:w-64">Language</div>
+            <div className="w-24 md:w-32 lg:w-32 xl:w-48">Editor</div>
             <div className="w-24 text-right">Hours</div>
           </div>
 
@@ -304,7 +310,7 @@ export default function LeaderboardTable({
                   )}
 
                   {/* MOBILE TOP ROW / DESKTOP LEFT FLEX */}
-                  <div className="flex items-center w-full md:w-auto md:flex-1 min-w-0">
+                  <div className="flex items-center w-full md:w-auto md:flex-1 min-w-0 md:min-w-[150px]">
                     {/* Rank */}
                     <div className="w-8 sm:w-12 shrink-0 text-center flex items-center justify-center">
                       <span
@@ -317,12 +323,12 @@ export default function LeaderboardTable({
                     {/* Profile + Badges */}
                     <div className="flex-1 ml-3 sm:ml-4 min-w-0 flex items-center gap-3">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-lg bg-gradient-to-br from-white/5 to-white/10 border border-white/10 flex items-center justify-center text-[10px] sm:text-sm font-semibold text-gray-300 shadow-sm uppercase">
-                        {user.email.charAt(0)}
+                        {user.email?.charAt(0) || "?"}
                       </div>
                       <div className="flex flex-col min-w-0 gap-1 sm:gap-1.5">
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-gray-200 tracking-tight text-sm sm:text-[15px] truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[180px] lg:max-w-[200px] leading-none">
-                            {user.email.split("@")[0]}
+                            {user.email?.split("@")[0] || "Unknown"}
                           </p>
                           {isCurrentUser && (
                             <span className="px-1.5 py-0.5 rounded border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 text-[8px] sm:text-[9px] uppercase font-bold tracking-widest leading-none">
@@ -358,7 +364,7 @@ export default function LeaderboardTable({
                   {/* MOBILE BOTTOM STACK / DESKTOP RIGHT ROW */}
                   <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto mt-4 md:mt-0 pl-[2.75rem] sm:pl-[4.25rem] md:pl-0 gap-2.5 md:gap-0">
                       {/* Language */}
-                    <div className="flex flex-wrap items-center gap-1.5 w-full md:w-48 lg:w-72 xl:w-80 md:shrink-0 md:pr-4">
+                    <div className="flex flex-wrap items-center gap-1.5 w-full md:w-48 lg:w-48 xl:w-64 md:shrink-0 md:pr-4">
                       {user.languages.length > 0 ? (
                         user.languages.map((lang, i) => (
                           <span
@@ -376,7 +382,7 @@ export default function LeaderboardTable({
                     </div>
 
                       {/* Editor */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-32 lg:w-48 md:shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-32 lg:w-32 xl:w-48 md:shrink-0">
                       {user.editor !== "N/A" && (
                         <span className="text-[10px] sm:text-[11px] text-gray-400 font-medium truncate max-w-[70px] lg:max-w-[90px]">
                           {user.editor}
@@ -408,6 +414,42 @@ export default function LeaderboardTable({
           </div>
         </div>
       )}
+      </div>
+
+      {/* Rankings Legend */}
+      <div className="xl:w-64 shrink-0 mt-8 xl:mt-0 flex flex-col gap-6">
+      <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 h-fit">
+        <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center justify-start gap-2">
+          Rankings Legend
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-1 gap-2">
+          {[
+            { hours: 160, label: "MISSION IMPOSSIBLE" },
+            { hours: 130, label: "GOD LEVEL" },
+            { hours: 100, label: "STARLIGHT" },
+            { hours: 50, label: "ELITE" },
+            { hours: 20, label: "PRO" },
+            { hours: 5, label: "NOVICE" },
+            { hours: 1, label: "NEWBIE" },
+            { hours: 0, label: "none" },
+          ].map((item) => {
+            const b = getBadgeInfo(0, item.hours);
+            return (
+              <div key={item.hours} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.06] transition-colors gap-2">
+                <div className={`badge-base ${b.class} shrink-0 !text-[9px] !py-0.5 !px-2`}>
+                  {b.icon && <FontAwesomeIcon icon={b.icon} className="w-2.5 h-2.5" />}
+                  {b.label}
+                </div>
+                <span className="text-[10px] text-gray-500 font-mono font-medium">
+                  {item.hours === 0 ? "0 hrs" : `${item.hours}+`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    
+      </div>
     </div>
   );
 }

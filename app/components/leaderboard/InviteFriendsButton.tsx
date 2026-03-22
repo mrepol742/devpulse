@@ -4,11 +4,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 
-export default function InviteFriendsButton() {
+export default function InviteFriendsButton({ joinCode, leaderboardName }: { joinCode?: string; leaderboardName?: string }) {
   const handleInvite = () => {
     if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Leaderboard link copied to clipboard!");
+      const inviteUrl = joinCode
+        ? `${window.location.origin}/join/${joinCode}`
+        : window.location.href; // fallback
+
+      const message = leaderboardName
+        ? `Join my coding leaderboard "${leaderboardName}" on DevPulse!\n\nTrack metrics, compete with fellow developers, and showcase your engineering skills.\n\nJoin here: ${inviteUrl}`
+        : `Join my coding leaderboard on DevPulse!\n\nJoin here: ${inviteUrl}`;
+
+      navigator.clipboard.writeText(message);
+      toast.success("Invite message copied to clipboard!");
     }
   };
 
