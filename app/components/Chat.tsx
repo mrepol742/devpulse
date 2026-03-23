@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Conversations from "./chat/Conversations";
 import Messages from "./chat/Messages";
-import { toast } from "react-toastify";
 
 export interface Conversation {
   id: string;
