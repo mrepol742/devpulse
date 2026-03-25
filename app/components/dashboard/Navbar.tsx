@@ -12,6 +12,7 @@ import {
   faChevronRight,
   faMessage,
   faCrown,
+  faDashboard,
 } from "@fortawesome/free-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
@@ -22,17 +23,38 @@ const SidebarContext = createContext({
   isMobile: false,
 });
 
-function Sidebar() {
+function Sidebar({ role }: { role: string }) {
   const pathname = usePathname();
   const { collapsed, mobileHidden, setMobileHidden, isMobile } =
     useContext(SidebarContext);
 
-  const navItems: { href: string; label: string; icon: IconDefinition }[] = [
-    { href: "/dashboard", label: "Dashboard", icon: faChartLine },
-    { href: "/dashboard/chat", label: "Chat", icon: faMessage },
-    { href: "/dashboard/flex", label: "Flex", icon: faCrown },
-    { href: "/dashboard/leaderboards", label: "Leaderboards", icon: faTrophy },
+  const navItems: {
+    href: string;
+    label: string;
+    icon: IconDefinition;
+    role: string;
+  }[] = [
+    {
+      href: "/dashboard/admin",
+      label: "Admin",
+      icon: faDashboard,
+      role: "admin",
+    },
+    { href: "/dashboard", label: "Dashboard", icon: faChartLine, role: "user" },
+    { href: "/dashboard/chat", label: "Chat", icon: faMessage, role: "user" },
+    { href: "/dashboard/flex", label: "Flex", icon: faCrown, role: "user" },
+    {
+      href: "/dashboard/leaderboards",
+      label: "Leaderboards",
+      icon: faTrophy,
+      role: "user",
+    },
   ];
+
+  const getAuthorization = (itemRole: string, userRole: string) => {
+    if (itemRole === "admin" && userRole !== "admin") return false;
+    return true;
+  };
 
   return (
     <aside
@@ -71,27 +93,32 @@ function Sidebar() {
               Menu
             </p>
           )}
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                collapsed ? "justify-center" : ""
-              } ${
-                pathname === item.href
-                  ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/15"
-                  : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
-              }`}
-              title={collapsed ? item.label : undefined}
-            >
-              <FontAwesomeIcon
-                icon={item.icon}
-                className={`w-4 h-4 shrink-0 ${
-                  pathname === item.href ? "text-indigo-400" : "text-gray-600"
-                }`}
-              />
-              {!collapsed && item.label}
-            </Link>
+          {navItems.map((item, idx) => (
+            <div key={idx}>
+              {getAuthorization(item.role, role) && (
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    collapsed ? "justify-center" : ""
+                  } ${
+                    pathname === item.href
+                      ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/15"
+                      : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
+                  }`}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <FontAwesomeIcon
+                    icon={item.icon}
+                    className={`w-4 h-4 shrink-0 ${
+                      pathname === item.href
+                        ? "text-indigo-400"
+                        : "text-gray-600"
+                    }`}
+                  />
+                  {!collapsed && item.label}
+                </Link>
+              )}
+            </div>
           ))}
         </nav>
       ) : null}
@@ -100,10 +127,14 @@ function Sidebar() {
 }
 
 export default function DashboardLayout({
+  email,
+  name,
+  role,
   children,
 }: {
   email: string;
   name: string;
+  role: string;
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -190,7 +221,7 @@ export default function DashboardLayout({
       value={{ collapsed, mobileHidden, setMobileHidden, isMobile }}
     >
       <div className="min-h-screen bg-[#0a0a1a] text-white">
-        <Sidebar />
+        <Sidebar role={role} />
 
         <button
           onClick={() => setCollapsed(!collapsed)}
