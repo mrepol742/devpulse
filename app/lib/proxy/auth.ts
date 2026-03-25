@@ -26,8 +26,8 @@ export default async function Auth(req: NextRequest) {
   );
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
   const { pathname } = req.nextUrl;
 
   const protectedRoutes = ["/dashboard", "/update-password", "/logout"];
@@ -36,13 +36,13 @@ export default async function Auth(req: NextRequest) {
     return regex.test(pathname);
   });
 
-  if (isProtectedRoute && !user) {
+  if (isProtectedRoute && !session) {
     console.log("User is not authenticated, redirecting to login.");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
   const authRoutes = ["/login", "/signup"];
-  if (authRoutes.includes(pathname) && user) {
+  if (authRoutes.includes(pathname) && session) {
     console.log("User is authenticated, redirecting to dashboard.");
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
