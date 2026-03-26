@@ -134,3 +134,15 @@ body {
   border-color: rgba(99, 102, 241, 0.2);
   background: rgba(15, 15, 40, 0.7);
 }
+
+@media (min-width: 376px) {
+  .flex-row-321 {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 375px) {
+  .flex-row-321 {
+    flex-direction: column;
+  }
+}
