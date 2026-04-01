@@ -1,7 +1,11 @@
 CREATE OR REPLACE FUNCTION sync_conversation_type()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.type := (SELECT type FROM conversations WHERE id = NEW.conversation_id);
+  NEW.type := (
+    SELECT type
+    FROM conversations
+    WHERE id = NEW.conversation_id
+  );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
