@@ -10,7 +10,6 @@ alter table public.leaderboards
 add constraint leaderboards_join_code_format
 check (join_code ~ '^[A-Za-z0-9]{1,8}$');
 
-
 create policy "Owner can delete leaderboard"
 on public.leaderboards
 for delete

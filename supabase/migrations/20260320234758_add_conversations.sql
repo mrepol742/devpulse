@@ -24,8 +24,10 @@ CREATE TABLE messages (
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 /* ---- RLS Policies ----- */
-CREATE POLICY "participants can read messages" ON messages
-FOR SELECT USING (
+CREATE POLICY "participants can read messages"
+ON messages
+FOR SELECT
+USING (
   EXISTS (
     SELECT 1
     FROM conversation_participants
@@ -34,8 +36,10 @@ FOR SELECT USING (
   )
 );
 
-CREATE POLICY "participants can send messages" ON messages
-FOR INSERT WITH CHECK (
+CREATE POLICY "participants can send messages"
+ON messages
+FOR INSERT
+WITH CHECK (
   EXISTS (
     SELECT 1
     FROM conversation_participants
