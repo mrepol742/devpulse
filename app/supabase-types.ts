@@ -17,7 +17,7 @@ export type Database = {
       conversation_participants: {
         Row: {
           conversation_id: string
-          email: string | null
+          email: string
           last_read_at: string
           last_seen_at: string
           type: string
@@ -25,7 +25,7 @@ export type Database = {
         }
         Insert: {
           conversation_id: string
-          email?: string | null
+          email: string
           last_read_at?: string
           last_seen_at?: string
           type?: string
@@ -33,7 +33,7 @@ export type Database = {
         }
         Update: {
           conversation_id?: string
-          email?: string | null
+          email?: string
           last_read_at?: string
           last_seen_at?: string
           type?: string
@@ -51,17 +51,17 @@ export type Database = {
       }
       conversations: {
         Row: {
-          created_at: string
+          created_at: string | null
           id: string
           type: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           id?: string
           type?: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           id?: string
           type?: string
         }
@@ -104,7 +104,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          is_public: boolean | null
+          is_public: boolean
           join_code: string
           name: string
           owner_id: string
@@ -114,7 +114,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          is_public?: boolean | null
+          is_public?: boolean
           join_code: string
           name: string
           owner_id: string
@@ -124,7 +124,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          is_public?: boolean | null
+          is_public?: boolean
           join_code?: string
           name?: string
           owner_id?: string
@@ -287,17 +287,17 @@ export type Database = {
       user_projects: {
         Row: {
           last_fetched_at: string
-          projects: Json
+          projects: Json | null
           user_id: string
         }
         Insert: {
           last_fetched_at?: string
-          projects: Json
+          projects?: Json | null
           user_id: string
         }
         Update: {
           last_fetched_at?: string
-          projects?: Json
+          projects?: Json | null
           user_id?: string
         }
         Relationships: []
@@ -324,11 +324,11 @@ export type Database = {
           daily_stats?: Json
           dependencies?: Json
           editors?: Json
-          languages: Json
+          languages?: Json
           last_fetched_at?: string
           machines?: Json
           operating_systems?: Json
-          total_seconds: number
+          total_seconds?: number
           user_id: string
         }
         Update: {
